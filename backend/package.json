@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "node --env-file .env.local --watch index.js "
+    "dev": "node --env-file .env.local --watch src/index.js "
   },
   "devDependencies": {
     "@types/bun": "latest"
