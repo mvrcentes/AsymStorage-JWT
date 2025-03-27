@@ -109,7 +109,9 @@ const Register = () => {
           )}
         />
 
-        <Button type="submit">Register</Button>
+        <Button type="submit" className="ml-0">
+          Login
+        </Button>
       </form>
     </Form>
   )

@@ -24,3 +24,8 @@ export const generateKeyPair = () => {
 
   return { publicKey, privateKey }
 }
+
+// 🔑 Comparar contraseña
+export const comparePasswords = async (plainPassword, hashedPassword) => {
+  return await bcrypt.compare(plainPassword, hashedPassword)
+}
