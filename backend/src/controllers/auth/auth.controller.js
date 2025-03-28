@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
 
-import supabase from "../database.js"
-import { hashPassword, comparePasswords } from "../utils/crypto.js"
+import supabase from "../../database.js"
+import { hashPassword, comparePasswords } from "../../utils/crypto.js"
 
 
 export const register = async (req, res) => {
