@@ -7,6 +7,7 @@ import "./database.js"
 import { errorHandler } from "./middleware/erros.js"
 
 import authRoutes from "./routes/auth.routes.js"
+import keymanageRoutes from "./routes/keymanage.routes.js"
 
 // Express initialization
 const app = express()
@@ -35,6 +36,7 @@ app.get("/", (req, res) => {
   res.send("Hello world")
 })
 app.use("/api/auth", authRoutes)
+app.use("/api/keymanage", keymanageRoutes)
 
 // Error handler
 app.use(errorHandler)
