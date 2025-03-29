@@ -37,7 +37,7 @@ const Login = () => {
     try {
       const { email, password } = data
       const response = await loginUser(email, password)
-  
+
       saveToken(response.token)
       console.log("✅ Logged in:", response)
       // Redirige al home

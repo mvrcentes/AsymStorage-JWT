@@ -13,7 +13,7 @@ import Register from "./Register"
 
 const Auth = () => {
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex justify-center items-center min-h-screen min-w-screen">
       <Tabs defaultValue="login" className="w-[400px] space-y-4">
         <TabsList className="grid w-full grid-cols-2 gap-2 bg-muted p-1 rounded-md">
           <TabsTrigger

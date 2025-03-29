@@ -98,7 +98,7 @@ const KeyManager = () => {
   }
 
   return (
-    <Card className="w-[500px] mx-auto mt-10 space-y-4">
+    <Card className="w-[500px] mt-10 space-y-4">
       <CardHeader>
         <CardTitle>Key Generator</CardTitle>
       </CardHeader>
