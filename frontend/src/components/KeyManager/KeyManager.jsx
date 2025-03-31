@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import classNames from "classnames"
 import { updateKey } from "@/api/keymanage/keymanage"
 
-const KeyManager = () => {
+const KeyManager = ({ onPrivateKeyGenerated }) => {
   const [algorithm, setAlgorithm] = useState("RSA")
   const [publicKey, setPublicKey] = useState("")
 
@@ -42,6 +42,9 @@ const KeyManager = () => {
 
       setPublicKey(publicPem)
       downloadPrivateKey(privatePem)
+      if (onPrivateKeyGenerated) {
+        onPrivateKeyGenerated(privatePem)
+      }
     }
 
     if (algorithm === "ECC") {
@@ -68,6 +71,9 @@ const KeyManager = () => {
 
       setPublicKey(publicPem)
       downloadPrivateKey(privatePem)
+      if (onPrivateKeyGenerated) {
+        onPrivateKeyGenerated(privatePem)
+      }
     }
   }
 

@@ -24,3 +24,16 @@ export const isAuthenticated = () => {
 export const logout = () => {
   localStorage.removeItem("token")
 }
+
+export const convertPemToBinary = (pem) => {
+  const lines = pem.trim().split("\n")
+  const base64 = lines.slice(1, -1).join("")
+  const binary = atob(base64)
+  const buffer = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) {
+    buffer[i] = binary.charCodeAt(i)
+  }
+  return buffer
+}
+
+
