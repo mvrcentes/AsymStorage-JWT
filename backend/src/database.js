@@ -1,12 +1,20 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js"
 
 const supabase = createClient(
-	process.env.PUBLIC_SUPABASE_URL,
-	process.env.PUBLIC_SUPABASE_ANON_KEY,
-);
+  process.env.PUBLIC_SUPABASE_URL,
+  process.env.PUBLIC_SUPABASE_ANON_KEY
+)
+
+export const supabaseAdmin = createClient(
+  process.env.PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE
+)
 
 if (!supabase) {
-	throw new Error("Supabase client could not be created");
+  throw new Error("Supabase client could not be created")
 }
 
-export default supabase;
+const { data, error } = await supabase.storage.listBuckets()
+console.log(data)
+
+export default supabase

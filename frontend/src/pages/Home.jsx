@@ -6,6 +6,7 @@ import { jwtDecode } from "jwt-decode"
 
 const Home = () => {
   const [userName, setUserName] = useState("")
+  const [privateKey, setPrivateKey] = useState("test1")
 
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -17,10 +18,10 @@ const Home = () => {
 
   return (
     <div className="flex flex-row justify-center items-center gap-4 min-w-screen ">
-      <KeyManager />
+      <KeyManager onPrivateKeyGenerated={setPrivateKey}/>
       <div className="flex flex-col gap-8">
         <h1>Welcome {userName}</h1>
-        <FileManage />
+        <FileManage  privateKey={privateKey} onKeyChange={setPrivateKey}/>
       </div>
     </div>
   )
