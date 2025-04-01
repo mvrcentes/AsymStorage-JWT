@@ -47,8 +47,8 @@ const UploadFile = ({ privateKey, onKeyChange }) => {
       console.log("✅ Firma generada (base64):", signatureBase64)
 
       const fileContentBase64 = await readFileAsBase64(file.url)
-
-      uploadFile(file, signatureBase64, fileContentBase64)
+      
+      uploadFile(file.file.name, signatureBase64, fileContentBase64)
         .then((response) => {
           console.log("✅ Archivo subido:", response)
         })

@@ -3,7 +3,7 @@ import axios from "axios"
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5000/api/files"
 
-export const uploadFile = async (file, firm, content) => {
+export const uploadFile = async (filename, firm, content) => {
   const token = localStorage.getItem("token")
   if (!token) {
     throw new Error("No token found")
@@ -16,7 +16,7 @@ export const uploadFile = async (file, firm, content) => {
     headers: headers,
   }
   const body = {
-    filename: file,
+    filename: filename,
     signature: firm,
     content: content,
   }

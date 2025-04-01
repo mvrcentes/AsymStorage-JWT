@@ -1,6 +1,6 @@
 import crypto from "crypto"
 import jwt from "jsonwebtoken"
-import supabase from "../../database.js"
+import supabase, { supabaseAdmin } from "../../database.js"
 
 export const uploadSignedFile = async (req, res) => {
   const authHeader = req.headers.authorization
@@ -29,9 +29,9 @@ export const uploadSignedFile = async (req, res) => {
     const fileBuffer = Buffer.from(content, "base64")
 
     // Upload file to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
       .from("asymstorage")
-      .upload(`files/${Date.now()}_${filename}`, fileBuffer, {
+      .upload(`files/${filename}`, fileBuffer, {
         contentType: "application/octet-stream",
         upsert: false,
       })
