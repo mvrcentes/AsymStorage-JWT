@@ -14,7 +14,4 @@ if (!supabase) {
   throw new Error("Supabase client could not be created")
 }
 
-const { data, error } = await supabase.storage.listBuckets()
-console.log(data)
-
 export default supabase

@@ -1,6 +1,7 @@
 // Global dependencies
 import cors from "cors"
 import express from "express"
+import fileUpload from "express-fileupload"
 
 // Project dependencies
 import "./database.js"
@@ -31,6 +32,7 @@ app.use((req, res, next) => {
 
 // Middlewares
 app.use(express.json())
+app.use(fileUpload())
 
 // Routes
 app.get("/", (req, res) => {

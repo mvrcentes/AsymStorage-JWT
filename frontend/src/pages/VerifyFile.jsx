@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 
 import FileOverlay from "../components/FileOverlay/FileOverlay"
-import { Button } from "@/components/ui/button"
 
 const VerifyFile = () => {
   const [files, setFiles] = useState([])
@@ -11,15 +10,13 @@ const VerifyFile = () => {
         props={{
           name: "Public key",
           value: files,
+          buttonLabel: "Verify",
           onChange: (files) => {
             setFiles(files)
             console.log(files)
           },
         }}>
-        <div className="flex flex-row gap-2 mt-6 justify-end">
-          {/* <Button>Firm</Button> */}
-
-          <Button>Verify</Button>
+        <div className="flex flex-row gap-2 mt-6 justify-end"> 
         </div>
       </FileOverlay>
     </div>

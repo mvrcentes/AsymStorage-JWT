@@ -9,18 +9,6 @@ import { uploadFile } from "../api/filemanage/filemanage"
 const UploadFile = ({ privateKey, onKeyChange }) => {
   const [files, setFiles] = useState([])
 
-  const readFileAsBase64 = async (fileUrl) => {
-    const res = await fetch(fileUrl)
-    const blob = await res.blob()
-  
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onloadend = () => resolve(reader.result.split(",")[1])
-      reader.onerror = reject
-      reader.readAsDataURL(blob)
-    })
-  }
-
   const handleSignFile = async ({ files, key }) => {
     try {
       const file = files[0]
@@ -46,9 +34,7 @@ const UploadFile = ({ privateKey, onKeyChange }) => {
       )
       console.log("✅ Firma generada (base64):", signatureBase64)
 
-      const fileContentBase64 = await readFileAsBase64(file.url)
-      
-      uploadFile(file.file.name, signatureBase64, fileContentBase64)
+      uploadFile(file.file, signatureBase64)
         .then((response) => {
           console.log("✅ Archivo subido:", response)
         })
