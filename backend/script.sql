@@ -15,3 +15,6 @@ CREATE TABLE files (
   content_hash TEXT NOT NULL,
   content TEXT NOT NULL
 );
+
+ALTER TABLE files
+ADD CONSTRAINT unique_file_per_user UNIQUE (nombre, user_id, content);

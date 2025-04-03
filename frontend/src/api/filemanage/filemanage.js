@@ -3,11 +3,7 @@ import axios from "axios"
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5000/api/files"
 
-export const uploadFile = async (
-  file,
-  signature,
-  hash
-) => {
+export const uploadSign = async (file, signature, hash) => {
   const token = localStorage.getItem("token")
   if (!token) {
     throw new Error("No token found")
@@ -27,7 +23,7 @@ export const uploadFile = async (
 
   try {
     const response = await axios.post(
-      `${API_URL}/files/upload`,
+      `${API_URL}/files/upload/sign`,
       formData,
       config
     )
@@ -79,6 +75,40 @@ export const getFileSignature = async (filename) => {
     return response.data
   } catch (error) {
     console.error("Error fetching file signature:", error)
+    throw error
+  }
+}
+
+export const uploadFileWithoutSignature = async (file, hash) => {
+  const token = localStorage.getItem("token")
+
+  if (!token) {
+    throw new Error("No token found")
+  }
+
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "multipart/form-data",
+  }
+
+  const config = {
+    headers: headers,
+  }
+
+  const formData = new FormData()
+  formData.append("file", file)
+  formData.append("filename", file.name)
+  formData.append("hash", hash)
+
+  try {
+    const response = await axios.post(
+      `${API_URL}/files/upload/unsigned`,
+      formData,
+      config
+    )
+    return response.data
+  } catch (error) {
+    console.error("Error uploading file without signature:", error)
     throw error
   }
 }

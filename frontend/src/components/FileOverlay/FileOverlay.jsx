@@ -47,12 +47,6 @@ const FileOverlay = ({ props, children }) => {
     },
   })
 
-  const handleSubmit = (data) => {
-    if (props.onSubmit) {
-      props.onSubmit({ files: data.file, key: data.key })
-    }
-  }
-
   useEffect(() => {
     form.setValue("key", props.privateKey)
   }, [props.privateKey, form])
@@ -60,7 +54,9 @@ const FileOverlay = ({ props, children }) => {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(handleSubmit)}
+        onSubmit={(e) => {
+          e.preventDefault()
+        }}
         className="flex flex-col w-full justify-center">
         <div className="flex flex-col w-full justify-center">
           <div className="flex flex-col gap-2">
@@ -91,7 +87,10 @@ const FileOverlay = ({ props, children }) => {
                         maxFiles: 1,
                         maxSize: 1 * 1024 * 1024,
                       }}
-                      onChange={(files) => field.onChange(files)}
+                      onChange={(files) => {
+                        field.onChange(files)
+                        props.onChange?.(files)
+                      }}
                       onFilesAdded={async (addedFiles) =>
                         console.log("Added:", addedFiles)
                       }
@@ -106,7 +105,16 @@ const FileOverlay = ({ props, children }) => {
 
           <div className="mt-6 flex justify-end gap-2">
             {children}
-            <Button type="submit">{props.buttonLabel || "Submit"}</Button>
+            <Button
+              onClick={() => {
+                props.onClick?.({
+                  files: form.getValues("file"),
+                  key: form.getValues("key"),
+                })
+              }}
+              type="button">
+              {props.buttonLabel || "Submit"}
+            </Button>
           </div>
         </div>
       </form>

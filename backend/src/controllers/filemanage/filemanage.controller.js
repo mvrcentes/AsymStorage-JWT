@@ -17,40 +17,28 @@ export const uploadSignedFile = async (req, res) => {
     return res.status(401).json({ error: "Invalid or expired token" })
   }
 
-  const { filename, signature } = req.body
+  const { filename, signature, hash } = req.body
   const file = req.files.file
 
-  if (!filename || !signature) {
+  if (!filename || !signature || !hash) {
     return res.status(400).json({ error: "Missing required fields" })
   }
 
   try {
-    // Convert base64 content to buffer
-    const fileBuffer = file.data
-    const mimeType = file.mimetype
+    const filePath = `files/${filename}`
 
-    // Upload file to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
-      .from("asymstorage")
-      .upload(`files/${filename}`, fileBuffer, {
-        contentType: mimeType,
-        upsert: true,
-      })
-
-    if (uploadError) {
-      return res.status(500).json({ error: uploadError.message })
-    }
-
-    const contentPath = uploadData.path
-
-    // Insert into 'files' table
-    const { error: insertError } = await supabase.from("files").insert({
-      nombre: filename,
-      user_id: email,
-      content_hash: req.body.hash,
-      content: contentPath,
-      signature,
-    })
+    const { error: insertError } = await supabase.from("files").upsert(
+      {
+        nombre: filename,
+        user_id: email,
+        content_hash: hash,
+        content: filePath,
+        signature: signature,
+      },
+      {
+        onConflict: ["nombre", "user_id", "content"],
+      }
+    )
 
     if (insertError) {
       return res.status(500).json({ error: insertError.message })
@@ -58,7 +46,7 @@ export const uploadSignedFile = async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "File uploaded and recorded successfully" })
+      .json({ message: "File metadata and signature recorded successfully" })
   } catch (err) {
     return res
       .status(500)
@@ -168,12 +156,18 @@ export const getFileSignature = async (req, res) => {
       .eq("user_id", email)
       .single()
 
-    if (fileError) {
-      return res.status(500).json({ error: fileError.message })
+    if (!fileData.signature) {
+      return res
+        .status(400)
+        .json({ error: "File does not have a signature yet" })
     }
 
     if (!fileData) {
       return res.status(404).json({ error: "File not found" })
+    }
+
+    if (fileError) {
+      return res.status(500).json({ error: fileError.message })
     }
 
     return res
@@ -181,5 +175,72 @@ export const getFileSignature = async (req, res) => {
       .json({ signature: fileData.signature, hash: fileData.content_hash })
   } catch (err) {
     return res.status(500).json({ error: err.message })
+  }
+}
+
+export const uploadFileWithoutSignature = async (req, res) => {
+  const authHeader = req.headers.authorization
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Unauthorized" })
+  }
+
+  const token = authHeader.split(" ")[1]
+  let email
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    email = decoded.email
+  } catch (error) {
+    return res.status(401).json({ error: "Invalid or expired token" })
+  }
+
+  const { filename, hash } = req.body
+  const file = req.files?.file
+
+  if (!filename || !hash || !file) {
+    return res.status(400).json({ error: "Missing required fields" })
+  }
+
+  try {
+    const fileBuffer = file.data
+    const mimeType = file.mimetype
+
+    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+      .from("asymstorage")
+      .upload(`files/${filename}`, fileBuffer, {
+        contentType: mimeType,
+        upsert: true,
+      })
+
+    if (uploadError) {
+      return res.status(500).json({ error: uploadError.message })
+    }
+
+    const contentPath = uploadData.path
+
+    const { error: insertError } = await supabase.from("files").upsert(
+      {
+        nombre: filename,
+        user_id: email,
+        content_hash: hash,
+        content: contentPath,
+        signature: null,
+      },
+      {
+        onConflict: ["nombre", "user_id", "content"],
+      }
+    )
+
+    if (insertError) {
+      return res.status(500).json({ error: insertError.message })
+    }
+
+    return res
+      .status(200)
+      .json({ message: "File uploaded without signature successfully" })
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ error: "Unexpected error", details: err.message })
   }
 }
