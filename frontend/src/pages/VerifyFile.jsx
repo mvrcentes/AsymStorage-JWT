@@ -5,21 +5,20 @@ import FileOverlay from "../components/FileOverlay/FileOverlay"
 
 import { getPublicKey } from "../api/user/user"
 import { getFileSignature } from "../api/filemanage/filemanage"
-import { convertPemToBinary } from "@/utils/utils"
+import { convertPemToBinary, detectKeyAlgorithm } from "@/utils/utils"
 
 const VerifyFile = () => {
   const [files, setFiles] = useState([])
   const [publicKey, setPublicKey] = useState(null)
+  const algorithm = publicKey ? detectKeyAlgorithm(publicKey) : null
 
-  const handleVerifyFile = async ({ files, key }) => {
+  const handleVerifyFile = async ({ files, key, algorithm }) => {
     try {
       const file = files[0]
       const filename = file.file.name
 
-      // 1. Obtener firma + hash del backend
       const { signature, hash } = await getFileSignature(filename)
 
-      // 2. Leer archivo y calcular hash local
       const response = await fetch(file.url)
       const arrayBuffer = await response.arrayBuffer()
 
@@ -28,28 +27,28 @@ const VerifyFile = () => {
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("")
 
-      console.log("🔐 Clave pública recibida:", key.slice(0, 100))
-      console.log("📁 Archivo:", file.file.name)
-      console.log("📄 Firma (base64):", signature)
-      console.log("🔢 Hash desde DB:", hash)
-      console.log("🔢 Hash local:", localHex)
-
       if (localHex !== hash) {
         toast.error("❌ El archivo fue modificado o corrupto")
         return
       }
 
-      // 3. Verificar firma digital
       const publicKey = await crypto.subtle.importKey(
         "spki",
         convertPemToBinary(key),
-        { name: "RSA-PSS", hash: "SHA-256" },
+        {
+          name: algorithm === "ECC" ? "ECDSA" : "RSA-PSS",
+          ...(algorithm === "ECC"
+            ? { namedCurve: "P-256" }
+            : { hash: "SHA-256" }),
+        },
         false,
         ["verify"]
       )
 
       const valid = await crypto.subtle.verify(
-        { name: "RSA-PSS", saltLength: 32 },
+        algorithm === "ECC"
+          ? { name: "ECDSA", hash: { name: "SHA-256" } }
+          : { name: "RSA-PSS", saltLength: 32 },
         publicKey,
         Uint8Array.from(atob(signature), (c) => c.charCodeAt(0)),
         arrayBuffer
@@ -61,14 +60,15 @@ const VerifyFile = () => {
         toast.error("❌ Firma inválida. No coincide con la clave pública.")
       }
     } catch (error) {
-      console.error("❌ Error verificando archivo:", error)
       toast.error(
         `Error verificando archivo: ${
           error?.response?.data?.error || error.message
         }`
       )
+      console.error("❌ Error verificando archivo:", error)
     }
   }
+
   useEffect(() => {
     const fetchPublicKey = async () => {
       try {
@@ -87,13 +87,14 @@ const VerifyFile = () => {
       {publicKey && (
         <FileOverlay
           props={{
-            name: "Public key",
+            name: "Public key " + algorithm,
             value: files,
             buttonLabel: "Verify",
             privateKey: publicKey,
+            algorithm: algorithm,
             onKeyChange: (key) => setPublicKey(key),
             onChange: (files) => setFiles(files),
-            onClick:  handleVerifyFile,
+            onClick: handleVerifyFile,
           }}>
           <div className="flex flex-row gap-2 mt-6 justify-end" />
         </FileOverlay>

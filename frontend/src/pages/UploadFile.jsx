@@ -47,13 +47,13 @@ const UploadFile = ({ privateKey, onKeyChange }) => {
     }
   }
 
-  const handleSignOnly = async ({ files, key }) => {
+  const handleSignOnly = async ({ files, key, algorithm }) => {
     try {
       const file = files[0]
       const response = await fetch(file.url)
       const arrayBuffer = await response.arrayBuffer()
 
-      // Calcular hash como en el backend
+      // Calcular hash
       const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer)
       const fileHash = Array.from(new Uint8Array(hashBuffer))
         .map((b) => b.toString(16).padStart(2, "0"))
@@ -63,14 +63,21 @@ const UploadFile = ({ privateKey, onKeyChange }) => {
       const privateKey = await window.crypto.subtle.importKey(
         "pkcs8",
         convertPemToBinary(key),
-        { name: "RSA-PSS", hash: "SHA-256" },
+        {
+          name: algorithm === "ECC" ? "ECDSA" : "RSA-PSS",
+          ...(algorithm === "ECC"
+            ? { namedCurve: "P-256" }
+            : { hash: "SHA-256" }),
+        },
         false,
         ["sign"]
       )
 
-      // Generar firma digital
+      // Firmar
       const signature = await window.crypto.subtle.sign(
-        { name: "RSA-PSS", saltLength: 32 },
+        algorithm === "ECC"
+          ? { name: "ECDSA", hash: { name: "SHA-256" } }
+          : { name: "RSA-PSS", saltLength: 32 },
         privateKey,
         arrayBuffer
       )
@@ -79,14 +86,12 @@ const UploadFile = ({ privateKey, onKeyChange }) => {
         String.fromCharCode(...new Uint8Array(signature))
       )
 
-      // Subir solo la firma y hash, no el archivo
       await uploadSign(file.file, signatureBase64, fileHash)
 
       toast.success("🖋 Firma generada y enviada correctamente")
-      console.log("✅ Firma generada (base64):", signatureBase64)
     } catch (error) {
-      console.error("❌ Error al firmar:", error)
       toast.error("Error al firmar archivo: " + error.message)
+      console.error("❌ Error al firmar:", error)
     }
   }
 

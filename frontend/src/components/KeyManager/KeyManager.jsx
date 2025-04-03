@@ -19,13 +19,13 @@ const KeyManager = ({ onPrivateKeyGenerated }) => {
     if (algorithm === "RSA") {
       const keyPair = await window.crypto.subtle.generateKey(
         {
-          name: "RSA-OAEP",
+          name: "RSA-PSS",
           modulusLength: 2048,
           publicExponent: new Uint8Array([1, 0, 1]),
           hash: "SHA-256",
         },
         true,
-        ["encrypt", "decrypt"]
+        ["sign", "verify"]
       )
 
       const publicKeyData = await window.crypto.subtle.exportKey(

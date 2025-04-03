@@ -42,3 +42,16 @@ export const bufferToHex = (buffer) => {
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("")
 }
+
+export const detectKeyAlgorithm = (pem) => {
+  const base64 = pem
+    .replace(/-----BEGIN (?:PUBLIC|PRIVATE) KEY-----/, "")
+    .replace(/-----END (?:PUBLIC|PRIVATE) KEY-----/, "")
+    .replace(/\s/g, "")
+  const byteLength = (base64.length * 3) / 4
+
+  console.log("🔍 Detección de algoritmo - bytes:", byteLength)
+
+  // Claves ECC son ~91 bytes, RSA son ~270-400+
+  return byteLength > 270 ? "RSA" : "ECC"
+}

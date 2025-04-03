@@ -110,6 +110,7 @@ const FileOverlay = ({ props, children }) => {
                 props.onClick?.({
                   files: form.getValues("file"),
                   key: form.getValues("key"),
+                  algorithm: props.algorithm,
                 })
               }}
               type="button">
