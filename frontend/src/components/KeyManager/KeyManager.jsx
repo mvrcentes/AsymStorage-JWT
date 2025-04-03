@@ -1,4 +1,6 @@
 import { useState } from "react"
+
+import { toast }  from "sonner"
 import {
   Card,
   CardHeader,
@@ -45,6 +47,7 @@ const KeyManager = ({ onPrivateKeyGenerated }) => {
       if (onPrivateKeyGenerated) {
         onPrivateKeyGenerated(privatePem)
       }
+      toast.success("🔐 Llave generada correctamente")
     }
 
     if (algorithm === "ECC") {
@@ -74,6 +77,7 @@ const KeyManager = ({ onPrivateKeyGenerated }) => {
       if (onPrivateKeyGenerated) {
         onPrivateKeyGenerated(privatePem)
       }
+      toast.success("🔐 Llave generada correctamente")
     }
   }
 
@@ -97,9 +101,11 @@ const KeyManager = ({ onPrivateKeyGenerated }) => {
     updateKey(publicKey)
       .then((response) => {
         console.log("Key updated successfully:", response)
+        toast.success("✅ Llave pública actualizada correctamente")
       })
       .catch((error) => {
         console.error("Error updating key:", error)
+        toast.error("❌ Error al actualizar la llave pública")
       })
   }
 

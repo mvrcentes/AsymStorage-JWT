@@ -26,8 +26,19 @@ const Browse = () => {
         {files.length > 0 ? (
           files.map((file, index) => (
             <div key={index} className="p-4 border rounded-md">
-              <h2>{file.name}</h2>
-              <p>{file.size} bytes</p>
+              <h2 className="font-semibold text-lg">{file.name}</h2>
+              <p className="text-sm text-gray-600">{file.size} bytes</p>
+              <p className="text-sm">
+                Estado de firma:{" "}
+                <span
+                  className={
+                    file.signature
+                      ? "text-green-600 font-semibold"
+                      : "text-red-500 font-medium"
+                  }>
+                  {file.signature ? "Firmado" : "No firmado"}
+                </span>
+              </p>
               <a
                 href={file.downloadUrl}
                 target="_blank"
