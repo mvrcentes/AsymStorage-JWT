@@ -5,9 +5,8 @@ const API_URL =
 
 export const uploadFile = async (
   file,
-  signature
-  // content,
-  // mimetype = "application/octet-stream"
+  signature,
+  hash
 ) => {
   const token = localStorage.getItem("token")
   if (!token) {
@@ -24,6 +23,7 @@ export const uploadFile = async (
   formData.append("file", file)
   formData.append("filename", file.name)
   formData.append("signature", signature)
+  formData.append("hash", hash)
 
   try {
     const response = await axios.post(
@@ -55,6 +55,30 @@ export const getFiles = async () => {
     return response.data
   } catch (error) {
     console.error("Error fetching files:", error)
+    throw error
+  }
+}
+
+export const getFileSignature = async (filename) => {
+  const token = localStorage.getItem("token")
+  if (!token) {
+    throw new Error("No token found")
+  }
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  }
+  const config = {
+    headers: headers,
+  }
+  try {
+    const response = await axios.get(
+      `${API_URL}/files/verify/${filename}`,
+      config
+    )
+    return response.data
+  } catch (error) {
+    console.error("Error fetching file signature:", error)
     throw error
   }
 }

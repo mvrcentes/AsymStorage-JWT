@@ -8,8 +8,9 @@ import "./database.js"
 import { errorHandler } from "./middleware/erros.js"
 
 import authRoutes from "./routes/auth.routes.js"
-import keymanageRoutes from "./routes/keymanage.routes.js"
 import filemanageRoutes from "./routes/filemanage.routes.js"
+import keymanageRoutes from "./routes/keymanage.routes.js"
+import userRoutes from "./routes/user.routes.js"
 
 // Express initialization
 const app = express()
@@ -41,6 +42,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes)
 app.use("/api/keymanage", keymanageRoutes)
 app.use("/api/files", filemanageRoutes)
+app.use("/api/user", userRoutes)
 
 // Error handler
 app.use(errorHandler)

@@ -9,11 +9,22 @@ import { uploadFile } from "../api/filemanage/filemanage"
 const UploadFile = ({ privateKey, onKeyChange }) => {
   const [files, setFiles] = useState([])
 
+  // Función para convertir un buffer a string hexadecimal
+  const bufferToHex = (buffer) => {
+    return Array.from(new Uint8Array(buffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
+  }
+
   const handleSignFile = async ({ files, key }) => {
     try {
       const file = files[0]
       const response = await fetch(file.url)
       const arrayBuffer = await response.arrayBuffer()
+
+      // Calcular el hash del archivo (SHA-256) igual que en el backend
+      const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer)
+      const fileHash = bufferToHex(hashBuffer)
 
       const privateKey = await window.crypto.subtle.importKey(
         "pkcs8",
@@ -34,7 +45,7 @@ const UploadFile = ({ privateKey, onKeyChange }) => {
       )
       console.log("✅ Firma generada (base64):", signatureBase64)
 
-      uploadFile(file.file, signatureBase64)
+      uploadFile(file.file, signatureBase64, fileHash)
         .then((response) => {
           console.log("✅ Archivo subido:", response)
         })
