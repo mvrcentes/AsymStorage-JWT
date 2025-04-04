@@ -8,9 +8,10 @@ Este proyecto está dividido en dos partes: `front` y `back`. Utiliza **Vite** p
 
 - Node.js >= 18
 - [Bun](https://bun.sh/)
-- `.env` configurados en ambos directorios (`front/.env` y `back/.env`)
+- `.env` configurados en ambos directorios (`front/.env.local` y `back/.env.local`)
 
 ---
+
 
 ## 🚀 Instalación
 
@@ -32,7 +33,27 @@ npm install
 bun install
 ```
 
+### Variables de entorno
 
+para frontend
+```bash
+frontend/.env.local
+
+VITE_API_URL
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
+```
+
+para backend
+```bash
+backend/.env.local
+
+PORT
+PUBLIC_SUPABASE_URL
+PUBLIC_SUPABASE_ANON_KEY
+JWT_SECRET
+SUPABASE_SERVICE_ROLE
+```
 
 Una vez que todo esté instalado y configurado, puedes iniciar los servidores de desarrollo:
 

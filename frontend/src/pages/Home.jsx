@@ -29,12 +29,15 @@ const Home = () => {
       <div className="flex flex-col gap-8">
         <h1>Welcome {userName}</h1>
         <FileManage privateKey={privateKey} onKeyChange={setPrivateKey} />
-        <button
+        <footer>
+         <button
           onClick={handleLogout}
           className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
         >
           Logout
-        </button>
+        </button> 
+        </footer>
+        
       </div>
     </div>
   )
