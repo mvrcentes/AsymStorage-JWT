@@ -25,7 +25,7 @@ export const uploadSignedFile = async (req, res) => {
   }
 
   try {
-    const filePath = `files/${filename}`
+    const filePath = `files/${email}/${filename}`
 
     const { error: insertError } = await supabase.from("files").upsert(
       {
@@ -71,10 +71,10 @@ export const getFiles = async (req, res) => {
   }
 
   try {
-    // Lista todos los archivos que realmente existen en Storage
+    // 👇 Lista solo archivos del usuario (usando carpeta del email)
     const { data: storageFiles, error: listError } = await supabaseAdmin.storage
       .from("asymstorage")
-      .list("files", {
+      .list(`files/${email}`, {
         limit: 100,
         offset: 0,
       })
@@ -83,24 +83,24 @@ export const getFiles = async (req, res) => {
       return res.status(500).json({ error: listError.message })
     }
 
-    // Extrae todos los nombres con prefijo completo
-    const validPaths = storageFiles.map((f) => `files/${f.name}`)
+    // 👇 Lista de paths reales que existen en Storage
+    const existingStoragePaths = storageFiles.map((f) => `files/${email}/${f.name}`)
 
-    // Ahora consulta solo los archivos del usuario actual Y que existan en Storage
+    // 👇 Consulta solo archivos del usuario que existan en storage
     const { data: userFiles, error: fileError } = await supabase
       .from("files")
       .select("*")
       .eq("user_id", email)
-      .in("content", validPaths)
+      .in("content", existingStoragePaths)
 
     if (fileError) {
       return res.status(500).json({ error: fileError.message })
     }
 
-    // Finalmente, mapea con los datos reales del archivo
+    // 👇 Mapea con datos reales del archivo
     const response = userFiles.map((file) => {
       const matchingFile = storageFiles.find(
-        (f) => file.content === `files/${f.name}`
+        (f) => file.content === `files/${email}/${f.name}`
       )
 
       const { data: urlData } = supabase.storage
@@ -125,6 +125,7 @@ export const getFiles = async (req, res) => {
   }
 }
 
+
 export const getFileSignature = async (req, res) => {
   const authHeader = req.headers.authorization
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -148,13 +149,21 @@ export const getFileSignature = async (req, res) => {
   }
 
   try {
-    // Busca el archivo en la base de datos
     const { data: fileData, error: fileError } = await supabase
       .from("files")
       .select("*")
       .eq("nombre", filename)
       .eq("user_id", email)
-      .single()
+      .limit(1)
+      .maybeSingle() // 👈 más tolerante que .single()
+
+    if (fileError) {
+      return res.status(500).json({ error: fileError.message })
+    }
+
+    if (!fileData) {
+      return res.status(404).json({ error: "File not found" })
+    }
 
     if (!fileData.signature) {
       return res
@@ -162,21 +171,15 @@ export const getFileSignature = async (req, res) => {
         .json({ error: "File does not have a signature yet" })
     }
 
-    if (!fileData) {
-      return res.status(404).json({ error: "File not found" })
-    }
-
-    if (fileError) {
-      return res.status(500).json({ error: fileError.message })
-    }
-
-    return res
-      .status(200)
-      .json({ signature: fileData.signature, hash: fileData.content_hash })
+    return res.status(200).json({
+      signature: fileData.signature,
+      hash: fileData.content_hash,
+    })
   } catch (err) {
     return res.status(500).json({ error: err.message })
   }
 }
+
 
 export const uploadFileWithoutSignature = async (req, res) => {
   const authHeader = req.headers.authorization
@@ -207,7 +210,7 @@ export const uploadFileWithoutSignature = async (req, res) => {
 
     const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
       .from("asymstorage")
-      .upload(`files/${filename}`, fileBuffer, {
+      .upload(`files/${email}/${filename}`, fileBuffer, {
         contentType: mimeType,
         upsert: true,
       })
