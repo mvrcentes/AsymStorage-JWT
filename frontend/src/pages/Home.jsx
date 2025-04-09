@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import KeyManager from "../components/KeyManager/KeyManager"
 import FileManage from "./FileManage"
 import { jwtDecode } from "jwt-decode"
+import Users from "./Users"
 
 const Home = () => {
   const [userName, setUserName] = useState("")
@@ -39,6 +40,7 @@ const Home = () => {
         </footer>
         
       </div>
+      <Users onPublicKeySelected={setPrivateKey} />
     </div>
   )
 }

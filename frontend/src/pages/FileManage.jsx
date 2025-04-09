@@ -17,7 +17,7 @@ import UploadFile from "./UploadFile"
 import VerifyFile from "./VerifyFile"
 import Browse from "./Browse"
 
-const FileManage = ({privateKey, onKeyChange}) => {
+const FileManage = ({ privateKey, onKeyChange }) => {
   const [fileState, setFileState] = useState("Upload File")
 
   return (
@@ -58,7 +58,7 @@ const FileManage = ({privateKey, onKeyChange}) => {
       <TabsContent value="Upload File">
         <Card>
           <CardContent className="space-y-2">
-            <UploadFile privateKey={privateKey} onKeyChange={onKeyChange}/>
+            <UploadFile privateKey={privateKey} onKeyChange={onKeyChange} />
           </CardContent>
         </Card>
       </TabsContent>
@@ -66,7 +66,7 @@ const FileManage = ({privateKey, onKeyChange}) => {
       <TabsContent value="Verify File">
         <Card>
           <CardContent className="space-y-2">
-            <VerifyFile />
+            <VerifyFile publicKey={privateKey} />
           </CardContent>
         </Card>
       </TabsContent>

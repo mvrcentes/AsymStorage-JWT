@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { toast } from "sonner"
 
 import FileOverlay from "../components/FileOverlay/FileOverlay"
 
-import { getPublicKey } from "../api/user/user"
 import { getFileSignature } from "../api/filemanage/filemanage"
 import { convertPemToBinary, detectKeyAlgorithm } from "@/utils/utils"
 
-const VerifyFile = () => {
+const VerifyFile = ({ publicKey }) => {
   const [files, setFiles] = useState([])
-  const [publicKey, setPublicKey] = useState(null)
   const algorithm = publicKey ? detectKeyAlgorithm(publicKey) : null
 
   const handleVerifyFile = async ({ files, key, algorithm }) => {
@@ -69,18 +67,7 @@ const VerifyFile = () => {
     }
   }
 
-  useEffect(() => {
-    const fetchPublicKey = async () => {
-      try {
-        const key = await getPublicKey()
-        setPublicKey(key.publicKey)
-      } catch (error) {
-        console.error("Error fetching public key:", error)
-      }
-    }
-
-    fetchPublicKey()
-  }, [publicKey])
+  console.log("🔐 publicKey en VerifyFile:", publicKey)
 
   return (
     <div className="flex w-full justify-center">
@@ -92,7 +79,7 @@ const VerifyFile = () => {
             buttonLabel: "Verify",
             privateKey: publicKey,
             algorithm: algorithm,
-            onKeyChange: (key) => setPublicKey(key),
+            // onKeyChange: (key) => setPublicKey(key),
             onChange: (files) => setFiles(files),
             onClick: handleVerifyFile,
           }}>

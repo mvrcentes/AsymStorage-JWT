@@ -33,3 +33,19 @@ export const getPublicKey = async (req, res) => {
   const publicKey = data.llave_publica
   return res.status(200).json({ publicKey })
 }
+
+export const getAllUsersWithKeys = async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("email, name, llave_publica")
+
+    if (error) {
+      return res.status(500).json({ error: error.message })
+    }
+
+    return res.status(200).json({ users: data })
+  } catch (err) {
+    return res.status(500).json({ error: "Unexpected error", details: err.message })
+  }
+}
