@@ -10,7 +10,7 @@ import {
   uploadFileWithoutSignature,
 } from "../api/filemanage/filemanage"
 
-const UploadFile = ({ privateKey, onKeyChange }) => {
+const UploadFile = ({ privateKey, onPrivateKeyChange }) => {
   const [files, setFiles] = useState([])
 
   // Función para convertir un buffer a string hexadecimal
@@ -60,7 +60,7 @@ const UploadFile = ({ privateKey, onKeyChange }) => {
         .join("")
 
       // Importar clave privada
-      const privateKey = await window.crypto.subtle.importKey(
+      const importedprivateKey = await window.crypto.subtle.importKey(
         "pkcs8",
         convertPemToBinary(key),
         {
@@ -78,7 +78,7 @@ const UploadFile = ({ privateKey, onKeyChange }) => {
         algorithm === "ECC"
           ? { name: "ECDSA", hash: { name: "SHA-256" } }
           : { name: "RSA-PSS", saltLength: 32 },
-        privateKey,
+          importedprivateKey,
         arrayBuffer
       )
 
@@ -102,8 +102,8 @@ const UploadFile = ({ privateKey, onKeyChange }) => {
           name: "Private key",
           buttonLabel: "Upload firm",
           value: files,
-          privateKey: privateKey,
-          onKeyChange: onKeyChange,
+          keyValue: privateKey,
+          onPrivateKeyChange: onPrivateKeyChange,
           onChange: (files) => {
             setFiles(files)
             console.log(files)

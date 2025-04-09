@@ -1,15 +1,5 @@
 import React, { useState } from "react"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import classNames from "classnames"
 
@@ -17,7 +7,12 @@ import UploadFile from "./UploadFile"
 import VerifyFile from "./VerifyFile"
 import Browse from "./Browse"
 
-const FileManage = ({ privateKey, onKeyChange, selectedUserEmail }) => {
+const FileManage = ({
+  privateKey,
+  onPrivateKeyChange,
+  publicKey,
+  selectedUserEmail,
+}) => {
   const [fileState, setFileState] = useState("Upload File")
 
   return (
@@ -58,7 +53,10 @@ const FileManage = ({ privateKey, onKeyChange, selectedUserEmail }) => {
       <TabsContent value="Upload File">
         <Card>
           <CardContent className="space-y-2">
-            <UploadFile privateKey={privateKey} onKeyChange={onKeyChange} />
+            <UploadFile
+              privateKey={privateKey}
+              onPrivateKeyChange={onPrivateKeyChange}
+            />
           </CardContent>
         </Card>
       </TabsContent>
@@ -67,7 +65,7 @@ const FileManage = ({ privateKey, onKeyChange, selectedUserEmail }) => {
         <Card>
           <CardContent className="space-y-2">
             <VerifyFile
-              publicKey={privateKey}
+              publicKey={publicKey}
               publicKeyOwner={selectedUserEmail}
             />
           </CardContent>

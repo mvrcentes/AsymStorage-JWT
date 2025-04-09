@@ -42,14 +42,14 @@ const FileOverlay = ({ props, children }) => {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      key: props.privateKey || "",
+      key: props.keyValue ||"",
       file: [],
     },
   })
 
   useEffect(() => {
-    form.setValue("key", props.privateKey)
-  }, [props.privateKey, form])
+    form.setValue("key", props.keyValue)
+  }, [props.keyValue, form])
 
   return (
     <Form {...form}>

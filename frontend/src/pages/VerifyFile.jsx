@@ -25,6 +25,9 @@ const VerifyFile = ({ publicKey, publicKeyOwner }) => {
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("")
 
+      console.log(localHex, hash)
+
+
       if (localHex !== hash) {
         toast.error("❌ El archivo fue modificado o corrupto")
         return
@@ -77,9 +80,8 @@ const VerifyFile = ({ publicKey, publicKeyOwner }) => {
             name: "Public key " + algorithm,
             value: files,
             buttonLabel: "Verify",
-            privateKey: publicKey,
-            algorithm: algorithm,
-            // onKeyChange: (key) => setPublicKey(key),
+            keyValue: publicKey,
+            algorithm: algorithm,            
             onChange: (files) => setFiles(files),
             onClick: handleVerifyFile,
           }}>

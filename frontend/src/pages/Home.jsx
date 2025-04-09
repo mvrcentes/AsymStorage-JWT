@@ -9,6 +9,8 @@ import Users from "./Users"
 const Home = () => {
   const [userName, setUserName] = useState("")
   const [privateKey, setPrivateKey] = useState("test1")
+  const [publicKey, setPublicKey] = useState(null)
+  const [algorithm, setAlgorithm] = useState("RSA")
   const [selectedUserEmail, setSelectedUserEmail] = useState(null)
   const navigate = useNavigate() // 🔥 aquí estaba el problema
 
@@ -27,12 +29,17 @@ const Home = () => {
 
   return (
     <div className="flex flex-row justify-center items-center gap-4 min-w-screen">
-      <KeyManager onPrivateKeyGenerated={setPrivateKey} />
+      <KeyManager
+        onPrivateKeyGenerated={setPrivateKey}
+        algorithm={algorithm}
+        setAlgorithm={setAlgorithm}
+      />
       <div className="flex flex-col gap-8">
         <h1>Welcome {userName}</h1>
         <FileManage
           privateKey={privateKey}
-          onKeyChange={setPrivateKey}
+          onPrivateKeyChange={setPrivateKey}
+          publicKey={publicKey}
           selectedUserEmail={selectedUserEmail}
         />
         <footer>
@@ -45,7 +52,7 @@ const Home = () => {
       </div>
       <Users
         onPublicKeySelected={(key, email) => {
-          setPrivateKey(key)
+          setPublicKey(key)
           setSelectedUserEmail(email)
         }}
       />

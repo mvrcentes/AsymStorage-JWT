@@ -13,8 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import classNames from "classnames"
 import { updateKey } from "@/api/keymanage/keymanage"
 
-const KeyManager = ({ onPrivateKeyGenerated }) => {
-  const [algorithm, setAlgorithm] = useState("RSA")
+const KeyManager = ({ onPrivateKeyGenerated, algorithm, setAlgorithm }) => {
   const [publicKey, setPublicKey] = useState("")
 
   const generateKeyPair = async () => {
