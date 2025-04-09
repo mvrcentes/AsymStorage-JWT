@@ -19,7 +19,15 @@ export const register = async (req, res) => {
       },
     ])
 
+    // Validar error por clave duplicada
     if (error) {
+      if (
+        error.message.includes("duplicate key") ||
+        error.message.includes("violates unique constraint")
+      ) {
+        return res.status(409).json({ error: "Email already exists" })
+      }
+
       return res.status(400).json({ error: error.message })
     }
 
@@ -30,27 +38,37 @@ export const register = async (req, res) => {
   }
 }
 
+
 export const login = async (req, res) => {
   const { email, password } = req.body
 
   try {
+    // Buscar al usuario por email
     const { data: user, error } = await supabase
       .from("users")
       .select("*")
       .eq("email", email)
       .single()
 
-    if (error || !user) {
-      return res.status(401).json({ error: "Invalid credentials" })
+    if (error) {
+      // Error al hacer la consulta (por ejemplo, error de conexión o algo inesperado)
+      console.error("Error querying user:", error)
+      return res.status(500).json({ error: "Database error" })
     }
 
+    if (!user) {
+      // Usuario no existe
+      return res.status(404).json({ error: "User not found" })
+    }
+
+    // Validar contraseña
     const isPasswordValid = await comparePasswords(password, user.password)
 
     if (!isPasswordValid) {
-      return res.status(401).json({ error: "Invalid credentials" })
+      return res.status(401).json({ error: "Incorrect password" })
     }
 
-    // ✅ Generar JWT
+    // Generar JWT si todo está OK
     const token = jwt.sign(
       {
         email: user.email,
@@ -62,7 +80,7 @@ export const login = async (req, res) => {
 
     return res.status(200).json({ message: "Login successful", token })
   } catch (error) {
-    console.log("Error logging in user:", error)
+    console.error("Error logging in user:", error)
     return res.status(500).json({ error: "Internal server error" })
   }
 }

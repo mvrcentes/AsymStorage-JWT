@@ -55,18 +55,24 @@ export const getFiles = async () => {
   }
 }
 
-export const getFileSignature = async (filename) => {
+export const getFileSignature = async (filename, owner) => {
   const token = localStorage.getItem("token")
   if (!token) {
     throw new Error("No token found")
   }
+
   const headers = {
     Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
   }
+
   const config = {
     headers: headers,
+    params: {
+      owner,
+    },
   }
+
   try {
     const response = await axios.get(
       `${API_URL}/files/verify/${filename}`,

@@ -10,7 +10,7 @@ import {
   uploadFileWithoutSignature,
 } from "../api/filemanage/filemanage"
 
-const UploadFile = ({ privateKey, onKeyChange }) => {
+const UploadFile = ({ privateKey, onPrivateKeyChange }) => {
   const [files, setFiles] = useState([])
 
   // Función para convertir un buffer a string hexadecimal
@@ -33,8 +33,9 @@ const UploadFile = ({ privateKey, onKeyChange }) => {
         return
       }
 
-      const response = await fetch(file.url)
-      const arrayBuffer = await response.arrayBuffer()
+      // const response = await fetch(file.url)
+      // const arrayBuffer = await response.arrayBuffer()
+      const arrayBuffer = await file.file.arrayBuffer()
 
       const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer)
       const fileHash = bufferToHex(hashBuffer)
@@ -50,8 +51,9 @@ const UploadFile = ({ privateKey, onKeyChange }) => {
   const handleSignOnly = async ({ files, key, algorithm }) => {
     try {
       const file = files[0]
-      const response = await fetch(file.url)
-      const arrayBuffer = await response.arrayBuffer()
+      // const response = await fetch(file.url)
+      // const arrayBuffer = await response.arrayBuffer()
+      const arrayBuffer = await file.file.arrayBuffer()
 
       // Calcular hash
       const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer)
@@ -60,7 +62,7 @@ const UploadFile = ({ privateKey, onKeyChange }) => {
         .join("")
 
       // Importar clave privada
-      const privateKey = await window.crypto.subtle.importKey(
+      const importedprivateKey = await window.crypto.subtle.importKey(
         "pkcs8",
         convertPemToBinary(key),
         {
@@ -78,13 +80,15 @@ const UploadFile = ({ privateKey, onKeyChange }) => {
         algorithm === "ECC"
           ? { name: "ECDSA", hash: { name: "SHA-256" } }
           : { name: "RSA-PSS", saltLength: 32 },
-        privateKey,
+        importedprivateKey,
         arrayBuffer
       )
 
       const signatureBase64 = btoa(
         String.fromCharCode(...new Uint8Array(signature))
       )
+
+      console.log("Uploaded hash:", fileHash)
 
       await uploadSign(file.file, signatureBase64, fileHash)
 
@@ -102,8 +106,8 @@ const UploadFile = ({ privateKey, onKeyChange }) => {
           name: "Private key",
           buttonLabel: "Upload firm",
           value: files,
-          privateKey: privateKey,
-          onKeyChange: onKeyChange,
+          keyValue: privateKey,
+          onPrivateKeyChange: onPrivateKeyChange,
           onChange: (files) => {
             setFiles(files)
             console.log(files)

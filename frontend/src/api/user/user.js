@@ -22,3 +22,23 @@ export const getPublicKey = async () => {
     throw error
   }
 }
+
+export const getAllUsers = async () => {
+  const token = localStorage.getItem("token")
+  if (!token) {
+    throw new Error("No token found")
+  }
+
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  }
+
+  try {
+    const response = await axios.get(`${API_URL}/user/all-users`, { headers })
+    return response.data.users
+  } catch (error) {
+    console.error("Error fetching all users:", error)
+    throw error
+  }
+}
