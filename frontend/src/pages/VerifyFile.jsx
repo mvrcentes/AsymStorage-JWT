@@ -15,18 +15,29 @@ const VerifyFile = ({ publicKey, publicKeyOwner }) => {
       const file = files[0]
       const filename = file.file.name
 
-      const { signature, hash } = await getFileSignature(filename, publicKeyOwner)
+      const { signature, hash } = await getFileSignature(
+        filename,
+        publicKeyOwner
+      )
 
-      const response = await fetch(file.url)
-      const arrayBuffer = await response.arrayBuffer()
+      // const response = await fetch(file.url)
+      // const arrayBuffer = await response.arrayBuffer()
+      const arrayBuffer = await file.file.arrayBuffer()
 
       const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer)
       const localHex = Array.from(new Uint8Array(hashBuffer))
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("")
 
-      console.log(localHex, hash)
+      console.log({localHex}, { hash })
 
+      const bufferA = new Uint8Array(hashBuffer)
+      const bufferB = Uint8Array.from(
+        hash.match(/.{1,2}/g).map((h) => parseInt(h, 16))
+      )
+
+      const isSameHash = bufferA.every((val, i) => val === bufferB[i])
+      console.log("🔍 Byte-by-byte hash match:", isSameHash)
 
       if (localHex !== hash) {
         toast.error("❌ El archivo fue modificado o corrupto")
@@ -81,7 +92,7 @@ const VerifyFile = ({ publicKey, publicKeyOwner }) => {
             value: files,
             buttonLabel: "Verify",
             keyValue: publicKey,
-            algorithm: algorithm,            
+            algorithm: algorithm,
             onChange: (files) => setFiles(files),
             onClick: handleVerifyFile,
           }}>

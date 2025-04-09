@@ -33,8 +33,9 @@ const UploadFile = ({ privateKey, onPrivateKeyChange }) => {
         return
       }
 
-      const response = await fetch(file.url)
-      const arrayBuffer = await response.arrayBuffer()
+      // const response = await fetch(file.url)
+      // const arrayBuffer = await response.arrayBuffer()
+      const arrayBuffer = await file.file.arrayBuffer()
 
       const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer)
       const fileHash = bufferToHex(hashBuffer)
@@ -50,8 +51,9 @@ const UploadFile = ({ privateKey, onPrivateKeyChange }) => {
   const handleSignOnly = async ({ files, key, algorithm }) => {
     try {
       const file = files[0]
-      const response = await fetch(file.url)
-      const arrayBuffer = await response.arrayBuffer()
+      // const response = await fetch(file.url)
+      // const arrayBuffer = await response.arrayBuffer()
+      const arrayBuffer = await file.file.arrayBuffer()
 
       // Calcular hash
       const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer)
@@ -78,13 +80,15 @@ const UploadFile = ({ privateKey, onPrivateKeyChange }) => {
         algorithm === "ECC"
           ? { name: "ECDSA", hash: { name: "SHA-256" } }
           : { name: "RSA-PSS", saltLength: 32 },
-          importedprivateKey,
+        importedprivateKey,
         arrayBuffer
       )
 
       const signatureBase64 = btoa(
         String.fromCharCode(...new Uint8Array(signature))
       )
+
+      console.log("Uploaded hash:", fileHash)
 
       await uploadSign(file.file, signatureBase64, fileHash)
 

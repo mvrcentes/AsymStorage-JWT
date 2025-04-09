@@ -29,8 +29,6 @@ const Users = ({ onPublicKeySelected }) => {
     fetchUsers()
   }, [])
 
-  console.log(users[0].llave_publica, users[0].email)
-
   return (
     <div>
       <h2 className="text-lg font-bold mb-2">Usuarios disponibles</h2>
