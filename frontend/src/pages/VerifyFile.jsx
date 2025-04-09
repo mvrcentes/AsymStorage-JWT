@@ -6,7 +6,7 @@ import FileOverlay from "../components/FileOverlay/FileOverlay"
 import { getFileSignature } from "../api/filemanage/filemanage"
 import { convertPemToBinary, detectKeyAlgorithm } from "@/utils/utils"
 
-const VerifyFile = ({ publicKey }) => {
+const VerifyFile = ({ publicKey, publicKeyOwner }) => {
   const [files, setFiles] = useState([])
   const algorithm = publicKey ? detectKeyAlgorithm(publicKey) : null
 
@@ -15,7 +15,7 @@ const VerifyFile = ({ publicKey }) => {
       const file = files[0]
       const filename = file.file.name
 
-      const { signature, hash } = await getFileSignature(filename)
+      const { signature, hash } = await getFileSignature(filename, publicKeyOwner)
 
       const response = await fetch(file.url)
       const arrayBuffer = await response.arrayBuffer()

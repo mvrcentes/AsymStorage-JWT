@@ -49,13 +49,13 @@ const Users = ({ onPublicKeySelected }) => {
                 </div>
                 <button
                   onClick={() => {
-                    onPublicKeySelected(user.llave_publica)
+                    onPublicKeySelected(user.llave_publica, user.email)
                     toast.success(
                       `🔐 Llave de ${user.name} aplicada correctamente`
                     )
                   }}
                   className="bg-blue-600 text-white text-sm px-3 py-1 rounded hover:bg-blue-700 transition">
-                  Usar
+                  Use
                 </button>
               </div>
             </li>

@@ -9,6 +9,7 @@ import Users from "./Users"
 const Home = () => {
   const [userName, setUserName] = useState("")
   const [privateKey, setPrivateKey] = useState("test1")
+  const [selectedUserEmail, setSelectedUserEmail] = useState(null)
   const navigate = useNavigate() // 🔥 aquí estaba el problema
 
   useEffect(() => {
@@ -29,18 +30,25 @@ const Home = () => {
       <KeyManager onPrivateKeyGenerated={setPrivateKey} />
       <div className="flex flex-col gap-8">
         <h1>Welcome {userName}</h1>
-        <FileManage privateKey={privateKey} onKeyChange={setPrivateKey} />
+        <FileManage
+          privateKey={privateKey}
+          onKeyChange={setPrivateKey}
+          selectedUserEmail={selectedUserEmail}
+        />
         <footer>
-         <button
-          onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
-        >
-          Logout
-        </button> 
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
+            Logout
+          </button>
         </footer>
-        
       </div>
-      <Users onPublicKeySelected={setPrivateKey} />
+      <Users
+        onPublicKeySelected={(key, email) => {
+          setPrivateKey(key)
+          setSelectedUserEmail(email)
+        }}
+      />
     </div>
   )
 }

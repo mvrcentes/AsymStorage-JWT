@@ -143,6 +143,7 @@ export const getFileSignature = async (req, res) => {
   }
 
   const { filename } = req.params
+  const { owner } = req.query
 
   if (!filename) {
     return res.status(400).json({ error: "Missing required fields" })
@@ -153,7 +154,7 @@ export const getFileSignature = async (req, res) => {
       .from("files")
       .select("*")
       .eq("nombre", filename)
-      .eq("user_id", email)
+      .eq("user_id", owner || email)
       .limit(1)
       .maybeSingle() // 👈 más tolerante que .single()
 
