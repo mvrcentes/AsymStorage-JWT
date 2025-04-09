@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useNavigate } from "react-router-dom"
-
+import {toast} from "sonner"
 import { login as loginUser } from "@/api/auth/auth"
 import { saveToken } from "../utils/utils"
 
@@ -37,15 +37,28 @@ const Login = () => {
     try {
       const { email, password } = data
       const response = await loginUser(email, password)
-
+  
       saveToken(response.token)
       console.log("✅ Logged in:", response)
-      // Redirige al home
-      navigate("/")
+  
+      toast.success("✅ Login successful!") // ✅
+  
+      navigate("/") // Redirige al home
     } catch (error) {
       console.error("❌ Login error:", error)
+  
+      const message = error.response?.data?.error
+  
+      if (message === "Database error") {
+        toast.error("❌ Email not registered")
+      } else if (message === "Incorrect password") {
+        toast.error("❌ Incorrect password")
+      } else {
+        toast.error("⚠️ Login failed. Please try again.")
+      }
     }
   }
+  
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

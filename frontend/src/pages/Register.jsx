@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { register as registerUser } from "@/api/auth/auth"
+import {toast} from "sonner"
 
 // Validación Zod con campo name agregado
 const formSchema = z
@@ -45,10 +46,18 @@ const Register = () => {
       const { name, email, password } = data
       const response = await registerUser(email, password, name)
       console.log("✅ Registered user:", response)
+      toast.success("Registration successful") // ✅ Éxito
     } catch (error) {
       console.error("❌ Registration error:", error)
+      if (error.response && error.response.status === 409) {
+        toast.error("❌ Email already exists")
+      } else {
+        toast.error("⚠️ Registration failed")
+      }
+      
     }
   }
+  
 
   return (
     <Form {...form}>
